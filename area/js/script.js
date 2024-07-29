@@ -1,29 +1,44 @@
-document.getElementById('unitSelect').addEventListener('change', function () {
+document.getElementById('unitSelect').addEventListener('change', function() {
     const selectedUnit = this.value;
     const singleInputGroup = document.getElementById('singleInputGroup');
     const bighaKathaDhurGroup = document.getElementById('bighaKathaDhurGroup');
+    const ropaniAnaPaisaDamGroup = document.getElementById('ropaniAnaPaisaDamGroup');
+
+    singleInputGroup.style.display = 'none';
+    bighaKathaDhurGroup.style.display = 'none';
+    ropaniAnaPaisaDamGroup.style.display = 'none';
 
     if (selectedUnit === 'bighaKathaDhur') {
-        singleInputGroup.style.display = 'none';
         bighaKathaDhurGroup.style.display = 'block';
+    } else if (selectedUnit === 'ropaniAnaPaisaDam') {
+        ropaniAnaPaisaDamGroup.style.display = 'block';
     } else {
         singleInputGroup.style.display = 'block';
-        bighaKathaDhurGroup.style.display = 'none';
     }
 
     convertUnits();
 });
 
+// Add event listeners for all inputs
 document.getElementById('inputValue').addEventListener('input', convertUnits);
 document.getElementById('bighaInput').addEventListener('input', convertUnits);
 document.getElementById('kathaInput').addEventListener('input', convertUnits);
 document.getElementById('dhurInput').addEventListener('input', convertUnits);
+document.getElementById('ropaniInput').addEventListener('input', convertUnits);
+document.getElementById('anaInput').addEventListener('input', convertUnits);
+document.getElementById('paisaInput').addEventListener('input', convertUnits);
+document.getElementById('damInput').addEventListener('input', convertUnits);
 
-document.getElementById('clearButton').addEventListener('click', function () {
+// Update the clear button function
+document.getElementById('clearButton').addEventListener('click', function() {
     document.getElementById('inputValue').value = '';
     document.getElementById('bighaInput').value = '';
     document.getElementById('kathaInput').value = '';
     document.getElementById('dhurInput').value = '';
+    document.getElementById('ropaniInput').value = '';
+    document.getElementById('anaInput').value = '';
+    document.getElementById('paisaInput').value = '';
+    document.getElementById('damInput').value = '';
     document.getElementById('results').innerHTML = '';
 });
 
@@ -40,13 +55,20 @@ function convertUnits() {
         // Convert everything to Dhur
         let totalDhur = (bigha * 20 * 20) + (katha * 20) + dhur;
 
-        // Convert Dhur back to Bigha-Katha-Dhur
-        bigha = Math.floor(totalDhur / (20 * 20));
-        katha = Math.floor((totalDhur % (20 * 20)) / 20);
-        dhur = totalDhur % 20;
-
         // Convert to square meters
         const squareMeters = totalDhur * 16.93;
+        inputValue = squareMeters / 4046.86; //  Convert to acres
+    } else if (selectedUnit === 'ropaniAnaPaisaDam') {
+        let ropani = parseFloat(document.getElementById('ropaniInput').value) || 0;
+        let ana = parseFloat(document.getElementById('anaInput').value) || 0;
+        let paisa = parseFloat(document.getElementById('paisaInput').value) || 0;
+        let dam = parseFloat(document.getElementById('damInput').value) || 0;
+
+        // Convert everything to Dam
+        let totalDam = (ropani * 16 * 4 * 4) + (ana * 4 * 4) + (paisa * 4) + dam;
+
+        // Convert to square meters
+        const squareMeters = totalDam * 1.99;
         inputValue = squareMeters / 4046.86; // Convert to acres
     } else {
         inputValue = parseFloat(document.getElementById('inputValue').value);
@@ -61,10 +83,17 @@ function convertUnits() {
         acre: inputValue,
         hectare: inputValue * 0.404686,
         squareMeter: inputValue * 4046.86,
+        squareFeet: inputValue * 43560,
         bighaKathaDhur: {
             bigha: 0,
             katha: 0,
             dhur: 0
+        },
+        ropaniAnaPaisaDam: {
+            ropani: 0,
+            ana: 0,
+            paisa: 0,
+            dam: 0
         }
     };
 
@@ -74,23 +103,40 @@ function convertUnits() {
     conversions.bighaKathaDhur.katha = Math.floor((totalDhur % (20 * 20)) / 20);
     conversions.bighaKathaDhur.dhur = totalDhur % 20;
 
-    if (selectedUnit !== 'acre' && selectedUnit !== 'bighaKathaDhur') {
-        const factor = conversions[selectedUnit] / inputValue;
-        conversions.acre /= factor;
-        conversions.hectare /= factor;
-        conversions.squareMeter /= factor;
+    // Convert acres to Ropani-Ana-Paisa-Dam
+    let totalDam = Math.round(inputValue * 4046.86 / 1.99);
+    conversions.ropaniAnaPaisaDam.ropani = Math.floor(totalDam / (16 * 4 * 4));
+    conversions.ropaniAnaPaisaDam.ana = Math.floor((totalDam % (16 * 4 * 4)) / (4 * 4));
+    conversions.ropaniAnaPaisaDam.paisa = Math.floor((totalDam % (4 * 4)) / 4);
+    conversions.ropaniAnaPaisaDam.dam = totalDam % 4;
 
-        // Recalculate Bigha-Katha-Dhur for non-acre units
+    if (selectedUnit !== 'acre' && selectedUnit !== 'bighaKathaDhur' && selectedUnit !== 'ropaniAnaPaisaDam') {
+        const factor = conversions[selectedUnit] / inputValue;
+        for (let unit in conversions) {
+            if (typeof conversions[unit] === 'number') {
+                conversions[unit] /= factor;
+            }
+        }
+
+        // Recalculate Bigha-Katha-Dhur and Ropani-Ana-Paisa-Dam for non-acre units
         totalDhur = Math.round(conversions.acre * 4046.86 / 16.93);
         conversions.bighaKathaDhur.bigha = Math.floor(totalDhur / (20 * 20));
         conversions.bighaKathaDhur.katha = Math.floor((totalDhur % (20 * 20)) / 20);
         conversions.bighaKathaDhur.dhur = totalDhur % 20;
+
+        totalDam = Math.round(conversions.acre * 4046.86 / 1.99);
+        conversions.ropaniAnaPaisaDam.ropani = Math.floor(totalDam / (16 * 4 * 4));
+        conversions.ropaniAnaPaisaDam.ana = Math.floor((totalDam % (16 * 4 * 4)) / (4 * 4));
+        conversions.ropaniAnaPaisaDam.paisa = Math.floor((totalDam % (4 * 4)) / 4);
+        conversions.ropaniAnaPaisaDam.dam = totalDam % 4;
     }
 
     resultsDiv.innerHTML = `
-${conversions.acre.toFixed(4)} Acres<br>
-${conversions.hectare.toFixed(4)} Hectares<br>
-${conversions.squareMeter.toFixed(4)} Square Meters<br>
-${conversions.bighaKathaDhur.bigha} Bigha, ${conversions.bighaKathaDhur.katha} Katha, ${conversions.bighaKathaDhur.dhur} Dhur
-`;
+        ${conversions.acre.toFixed(4)} Acres<br>
+        ${conversions.hectare.toFixed(4)} Hectares<br>
+        ${conversions.squareMeter.toFixed(4)} Square Meters<br>
+        ${conversions.squareFeet.toFixed(4)} Square Feet<br>
+        ${conversions.bighaKathaDhur.bigha} Bigha, ${conversions.bighaKathaDhur.katha} Katha, ${conversions.bighaKathaDhur.dhur} Dhur<br>
+        ${conversions.ropaniAnaPaisaDam.ropani} Ropani, ${conversions.ropaniAnaPaisaDam.ana} Ana, ${conversions.ropaniAnaPaisaDam.paisa} Paisa, ${conversions.ropaniAnaPaisaDam.dam} Dam
+    `;
 }
