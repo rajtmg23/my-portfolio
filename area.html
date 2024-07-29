@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Unit Conversion</title>
+    <!-- Bootstrap CSS -->
+    <link href="./area_calc/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./area_calc/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow p-4">
+                    <h3 class="text-center mb-4">Land Unit Conversion</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="unitSelect">Select Unit:</label>
+                            <select class="form-select form-control" id="unitSelect">
+                                <option value="acre">Acre</option>
+                                <option value="hectare">Hectare</option>
+                                <option value="squareMeter">Square Meter</option>
+                                <option value="bighaKathaDhur">Bigha-Katha-Dhur</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="singleInputGroup">
+                            <label for="inputValue">Input Value:</label>
+                            <input type="text" class="form-control" id="inputValue" placeholder="Enter value">
+                        </div>
+
+                        <div class="form-group" id="bighaKathaDhurGroup" style="display:none;">
+                            <label>Bigha-Katha-Dhur:</label>
+                            <div class="row">
+                                <div class="col">
+                                    <input type="text" class="form-control" id="bighaInput" placeholder="Bigha">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="kathaInput" placeholder="Katha">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="dhurInput" placeholder="Dhur">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Results:</label>
+                            <div id="results" class="border p-2" style="min-height: 40px;">
+                                <!-- Conversion results will be displayed here -->
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary mt-2" id="clearButton">Clear</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center mt-4">
+        <p>Created by Raju Tamang</a></p>
+    </footer>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="./area_calc/js/jquery-3.5.1.slim.min.js"></script>
+    <script src="./area_calc/js/popper.min.js"></script>
+    <script src="./area_calc/js//bootstrap.min.js"></script>
+    <script src="./area_calc/js/script.js"></script>
+</body>
+</html>
